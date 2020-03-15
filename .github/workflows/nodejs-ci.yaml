@@ -1,0 +1,53 @@
+name: Nodejs CI
+on:
+  push:
+    branches:
+      - v2
+      - master
+  schedule:
+    # * is a special character in YAML so you have to quote this string
+    - cron:  '*/60 */6 * * *'
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [10.x, 12.x]
+      fail-fast:
+        false
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+
+    - name: Clean npm cache directory
+      run: npm cache clear --force
+
+    - name: Get npm cache directory
+      id: npm-cache
+      run: echo "::set-output name=dir::$(npm config get cache)"
+
+    - name: Restore npm cache
+      uses: actions/cache@v1
+      with:
+        path: ${{ steps.npm-cache.outputs.dir }}
+        key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-node-
+
+    - run: yarn --frozen-lockfile
+
+    - run: yarn run test
+
+    - uses: actions/upload-artifact@v1
+      with:
+        name: code-coverage-report
+        path: coverage/html/lcov-report
+
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
