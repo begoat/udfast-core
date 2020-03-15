@@ -1,4 +1,5 @@
 const path = require('path');
+const pkg = require('./package.json');
 
 module.exports = {
   entry: './src/index.ts',
@@ -13,7 +14,7 @@ module.exports = {
     ],
   },
   output: {
-    filename: 'main.js',
+    filename: `udfast-core-v${pkg.version}.js`,
     path: path.resolve(__dirname, 'dist'),
   },
   resolve: {
