@@ -2,7 +2,15 @@
   "name": "udfast-core",
   "version": "1.0.0",
   "description": "core service for udfast-ui based on peerjs, enabling p2p file transfer.",
-  "main": "./dist/udfast-core.js",
+  "main": "./lib/src/index.js",
+  "typings": "lib/src/index.d.ts",
+  "module": "lib-esm/src/index.js",
+  "directories": {
+    "lib": "lib/src/"
+  },
+  "files": [
+    "dist"
+  ],
   "config": {
     "port": "9000",
     "tddRetry": "0",
@@ -13,7 +21,10 @@
   "scripts": {
     "tdd": "concurrently -k --restart-tries ${npm_package_config_tddRetry} \"npm:karma-test:watch\" \"npm:peer-serve\"",
     "test": "npm run lint && concurrently --success first -k \"npm:karam-test:singlerun\" \"npm:peer-serve\"",
-    "build": "NODE_ENV=production webpack --config webpack.prod.js",
+    "build": "rm -rf dist lib-esm lib && concurrently \"npm:build.*\"",
+    "build.commonjs": "tsc",
+    "build.es6": "tsc -m es6 --outDir lib-esm",
+    "build.umd": "cross-env NODE_ENV=production webpack --config webpack.prod.js",
     "peer-serve": "peerjs -p ${npm_package_config_port}",
     "lint": "eslint --ext .ts,.tsx src",
     "karam-test:singlerun": "export REPORT=1 && karma start --single-run",
@@ -48,6 +59,7 @@
     "babel-loader": "^8.0.6",
     "babel-preset-react-app": "^9.1.1",
     "concurrently": "^5.1.0",
+    "cross-env": "^7.0.2",
     "cz-conventional-changelog": "3.1.0",
     "eslint": "^6.8.0",
     "eslint-config-airbnb-typescript": "^7.0.0",
