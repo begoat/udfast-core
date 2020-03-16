@@ -9,7 +9,12 @@
     "lib": "lib/src/"
   },
   "files": [
-    "dist"
+    "CHANGELOG.md",
+    "README.md",
+    "lib",
+    "lib-esm",
+    "src",
+    "_bundles"
   ],
   "config": {
     "port": "9000",
@@ -28,7 +33,8 @@
     "peer-serve": "peerjs -p ${npm_package_config_port}",
     "lint": "eslint --ext .ts,.tsx src",
     "karam-test:singlerun": "export REPORT=1 && karma start --single-run",
-    "karma-test:watch": "karma start"
+    "karma-test:watch": "karma start",
+    "upload": "npm run build && npm publish --registry http://localhost:4873"
   },
   "repository": {
     "type": "git",
