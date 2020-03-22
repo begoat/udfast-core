@@ -1,10 +1,10 @@
 import Peer, { DataConnection } from 'peerjs';
 import _ from 'lodash';
 
-import { generatePeerId, generateTmpChannelId } from '@/utils/random';
-import { generateFile } from '@/utils/mock';
-import { CMD_SETS } from '@/constants/index';
-import { newPeerGeneratorWithReady, getWorkerNumBySize } from '@/utils/peering';
+import { generatePeerId, generateTmpChannelId } from '../../../../utils/random';
+import { generateFile } from '../../../../utils/mock';
+import { CMD_SETS } from '../../../../constants/index';
+import { newPeerGeneratorWithReady, getWorkerNumBySize } from '../../../../utils/peering';
 
 import {
   CommunicationData,

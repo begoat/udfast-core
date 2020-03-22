@@ -1,9 +1,9 @@
 import Peer, { DataConnection } from 'peerjs';
 import _ from 'lodash';
 
-import { generatePeerId, generateFileId } from '@/utils/random';
-import { newPeerGeneratorWithReady, getWorkerNumBySize } from '@/utils/peering';
-import { CMD_SETS } from '@/constants';
+import { generatePeerId, generateFileId } from '../../../../utils/random';
+import { newPeerGeneratorWithReady, getWorkerNumBySize } from '../../../../utils/peering';
+import { CMD_SETS } from '../../../../constants';
 
 import {
   CommunicationData,

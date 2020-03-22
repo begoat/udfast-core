@@ -1,7 +1,7 @@
 import { DataConnection } from 'peerjs';
 import _ from 'lodash';
 
-import { CMD_SETS } from '@/constants';
+import { CMD_SETS } from '../../../../constants';
 
 import {
   CommunicationData,

@@ -1,4 +1,4 @@
-import { WORKER_CHUNK_SIZE } from '@/config/index';
+import { WORKER_CHUNK_SIZE } from '../../../../config/index';
 
 import { DMainMediator } from '../peer-related/DMainMediator';
 import { FileDownloader } from './FileDownloader';

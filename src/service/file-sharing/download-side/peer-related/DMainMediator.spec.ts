@@ -1,8 +1,8 @@
 import _ from 'lodash';
 
-import { getWorkerNumBySize } from '@/utils/peering';
-import { generateFile } from '@/utils/mock';
-import { generateFileId } from '@/utils/random';
+import { getWorkerNumBySize } from '../../../../utils/peering';
+import { generateFile } from '../../../../utils/mock';
+import { generateFileId } from '../../../../utils/random';
 
 import { DMainMediator } from './DMainMediator';
 import { UploadController } from '../../upload-side/controller/UploadController';

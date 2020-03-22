@@ -1,5 +1,5 @@
-import { newPeerGeneratorWithoutReady } from '@/utils/peering';
-import { generatePeerId } from '@/utils/random';
+import { newPeerGeneratorWithoutReady } from '../../../../utils/peering';
+import { generatePeerId } from '../../../../utils/random';
 
 import { DPeerBase } from './DPeerBase';
 

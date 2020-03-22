@@ -5,10 +5,10 @@ import {
   GET_ALL_FILE_TIMEOUT,
   START_DOWNLOAD_INTERVAL,
   START_DOWNLOAD_TIMEOUT,
-} from '@/config/index';
-import { CMD_SETS } from '@/constants';
-import { generatePeerId, generateTmpChannelId } from '@/utils/random';
-import { newPeerGeneratorWithReady } from '@/utils/peering/index';
+} from '../../../../config/index';
+import { CMD_SETS } from '../../../../constants';
+import { generatePeerId, generateTmpChannelId } from '../../../../utils/random';
+import { newPeerGeneratorWithReady } from '../../../../utils/peering/index';
 
 import { CommunicationData, CommAllListResp, CommStartDownloadingResp } from '../../types';
 import {

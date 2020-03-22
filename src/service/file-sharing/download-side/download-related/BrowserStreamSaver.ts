@@ -1,4 +1,4 @@
-import streamSaver from '@/libs/StreamSaver';
+import streamSaver from '../../../../libs/StreamSaver';
 
 /* eslint-disable */
 streamSaver.WritableStream = streamSaver.WritableStream;

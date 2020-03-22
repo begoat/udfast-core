@@ -1,4 +1,4 @@
-import { CMD_SETS } from '@/constants';
+import { CMD_SETS } from '../../constants';
 
 export interface FileAttr {
   fileName: string;

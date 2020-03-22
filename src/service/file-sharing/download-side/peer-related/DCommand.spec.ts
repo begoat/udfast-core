@@ -1,4 +1,4 @@
-import { getPermutationOfArray } from '@/utils/data';
+import { getPermutationOfArray } from '../../../../utils/data';
 
 import { getNextDownloadIdx } from './DCommand';
 

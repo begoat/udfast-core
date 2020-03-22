@@ -1,5 +1,5 @@
-import { generateFile } from '@/utils/mock';
-import { formatFullDate } from '@/utils/date';
+import { generateFile } from '../../../../utils/mock';
+import { formatFullDate } from '../../../../utils/date';
 
 import { BrowserStreamSaver } from './BrowserStreamSaver';
 

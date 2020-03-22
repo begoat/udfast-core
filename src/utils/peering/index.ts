@@ -1,8 +1,8 @@
 import Peer from 'peerjs';
 
-import { TURN_URL, STUN_URL, STUN_TURN_CREDENTIAL, STUN_TURN_USER, LOAD_M_PER_WORKER } from '@/config/index';
+import { TURN_URL, STUN_URL, STUN_TURN_CREDENTIAL, STUN_TURN_USER, LOAD_M_PER_WORKER } from '../../config/index';
 
-import pkg from '@/../package.json';
+import pkg from '../../../package.json';
 import { generatePeerId } from '../random';
 
 const iceServerConfig = [

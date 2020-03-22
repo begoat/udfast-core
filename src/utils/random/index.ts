@@ -1,6 +1,6 @@
 import { v4 } from 'uuid';
 
-import { peerIdLength, fileIdLength, passwdLength } from '@/config';
+import { peerIdLength, fileIdLength, passwdLength } from '../../config';
 
 export const getUUId = () => {
   return v4();

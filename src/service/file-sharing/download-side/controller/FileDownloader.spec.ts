@@ -1,5 +1,5 @@
-import { generateFile } from '@/utils/mock';
-import { getPermutationOfArray } from '@/utils/data';
+import { generateFile } from '../../../../utils/mock';
+import { getPermutationOfArray } from '../../../../utils/data';
 
 import { FileDownloader, ChunkStatus } from './FileDownloader';
 import { FileStorage } from '../../upload-side/controller/FileStorage';

@@ -1,4 +1,4 @@
-import { generatePeerId } from '@/utils/random';
+import { generatePeerId } from '../random';
 import { peerGeneratorForTestOnly } from './index';
 
 describe('peer instance', () => {

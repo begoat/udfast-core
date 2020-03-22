@@ -1,6 +1,6 @@
 import _ from 'lodash';
 
-import { generateFile } from '@/utils/mock';
+import { generateFile } from '../../../../utils/mock';
 
 import { UploadController } from '../../upload-side/controller/UploadController';
 import { DWorkerMediator } from './DWorkerMediator';

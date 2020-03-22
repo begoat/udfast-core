@@ -1,4 +1,4 @@
-import { generateFile } from '@/utils/mock';
+import { generateFile } from '../../../../utils/mock';
 
 import { FileStorage } from './FileStorage';
 

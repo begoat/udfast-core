@@ -1,9 +1,9 @@
 import Peer, { DataConnection } from 'peerjs';
 
-import { newPeerGeneratorWithReady } from '@/utils/peering';
-import { generatePeerId, generateTmpChannelId } from '@/utils/random';
-import { CMD_SETS } from '@/constants';
-import { REQUEST_FILE_BLOCK_INTERVAL, REQUEST_FILE_BLOCK_TIMEOUT } from '@/config/index';
+import { newPeerGeneratorWithReady } from '../../../../utils/peering';
+import { generatePeerId, generateTmpChannelId } from '../../../../utils/random';
+import { CMD_SETS } from '../../../../constants';
+import { REQUEST_FILE_BLOCK_INTERVAL, REQUEST_FILE_BLOCK_TIMEOUT } from '../../../../config/index';
 
 import {
   CbRecords,
