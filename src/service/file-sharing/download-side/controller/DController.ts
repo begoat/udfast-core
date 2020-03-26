@@ -6,6 +6,13 @@ import { getNextDownloadIdx } from '../peer-related/DCommand';
 import { UWorkerSets } from './UWorkerSets';
 import { DWorkerSets } from './DWorkerSets';
 
+enum CbType {
+  ACC = 'acc',
+  PROGRESS = 'progress',
+  EXCEPTION = 'exception',
+  CANCEL = 'cancel',
+}
+
 interface DownloadRecords {
   [downloadId: string]: {
     fileId: string;
@@ -14,6 +21,10 @@ interface DownloadRecords {
     fileDownload: FileDownloader;
     done: boolean;
     paused: boolean;
+    downloadAccCbList: Array<Function>;
+    downloadProgressCbList: Array<Function>;
+    downloadExceptionCbList: Array<Function>;
+    downloadCancelCbList: Array<Function>;
   };
 }
 
@@ -84,15 +95,27 @@ export class DController {
       dWorkerSets,
       fileDownload: new FileDownloader(fileName, fileSize, WORKER_CHUNK_SIZE),
       done: false,
-      paused: false
+      paused: false,
+      downloadAccCbList: [],
+      downloadProgressCbList: [],
+      downloadExceptionCbList: [],
+      downloadCancelCbList: [],
     };
   }
 
-  /**
-   * for the certain download process, register a callback on acc.
-   */
-  public registerDownloadAcc(downloadId: string, cb: Function) {
-    this._downloadRecords[downloadId].fileDownload.registerDownloadAccCb(cb);
+  public registerCbOnDownloadId(downloadId: string, cb: Function, type: CbType) {
+    let targetCbList: Array<Function> = [];
+    if (type === CbType.ACC) {
+      targetCbList = this._downloadRecords[downloadId].downloadAccCbList;
+    } else if (type === CbType.PROGRESS) {
+      targetCbList = this._downloadRecords[downloadId].downloadProgressCbList;
+    } else if (type === CbType.CANCEL) {
+      targetCbList = this._downloadRecords[downloadId].downloadCancelCbList;
+    } else if (type === CbType.EXCEPTION) {
+      targetCbList = this._downloadRecords[downloadId].downloadExceptionCbList;
+    }
+
+    targetCbList.push(cb);
   }
 
   public startDownloadFile(downloadId: string) {
@@ -112,6 +135,7 @@ export class DController {
     if (this._downloadRecords[downloadId]) {
       this._downloadRecords[downloadId].done = true;
       this._downloadRecords[downloadId].fileDownload.cancelDownload();
+      this._downloadRecords[downloadId].downloadCancelCbList.forEach(cb => cb());
     }
   }
 
@@ -123,7 +147,14 @@ export class DController {
       return false;
     }
 
-    const { dWorkerSets, uWorkerSets, fileId, fileDownload } = dRecords;
+    const {
+      dWorkerSets,
+      uWorkerSets,
+      fileId,
+      fileDownload,
+      downloadAccCbList,
+      downloadProgressCbList,
+    } = dRecords;
     dWorkerSets.getWorkerList().forEach(w => {
       const { id: workerId, obj: dWorkerMediatorObj } = w;
       if (dWorkerSets.checkWorkerAvailable(workerId)) {
@@ -143,14 +174,22 @@ export class DController {
             const { _totalNumOfChunks: totalChunks, _chunkWritePosition: currentChunkIdx } = fileDownload;
             const nextDIdx = getNextDownloadIdx(totalChunks, currentChunkIdx, dWorkerSets.getIsDownloadingChunkIdx());
             if (nextDIdx === -1) { // mark download acc
+              downloadAccCbList && downloadAccCbList.forEach(cb => cb());
               dRecords.done = true;
               return;
             }
 
-            const result =
-              await this.downloadChunkAndSave(downloadId, workerId, bestUploadWorkerId, nextDIdx, fileId, fileDownload);
             console.log('downloading nextChunkIdx', nextDIdx);
             uWorkerSets.decreaseConnNumById(workerId);
+            const result = await this.downloadChunkAndSave(
+              downloadId,
+              workerId,
+              bestUploadWorkerId,
+              nextDIdx,
+              fileId,
+              fileDownload,
+              downloadProgressCbList
+            );
             if (result) {
               this.triggerDownload(downloadId);
             }
@@ -176,10 +215,13 @@ export class DController {
     chunkIdx: number,
     fileId: string,
     fileDownloader: FileDownloader,
+    downloadProgressCbList: Array<Function>,
   ) {
     const { dWorkerSets } = this._downloadRecords[downloadId];
     dWorkerSets.setCurrentChunkIdxForWorker(workerId, chunkIdx);
+    downloadProgressCbList && downloadProgressCbList.forEach(cb => cb(chunkIdx, fileDownloader._totalNumOfChunks, 'start'));
     const fileBlockResp = await dWorkerSets.reqFileBlock(workerId, uploaderId, fileId, chunkIdx, WORKER_CHUNK_SIZE);
+    downloadProgressCbList && downloadProgressCbList.forEach(cb => cb(chunkIdx, fileDownloader._totalNumOfChunks, 'end'));
     return fileDownloader.pushCachedBlob(chunkIdx, fileBlockResp.chunkData);
   }
 
