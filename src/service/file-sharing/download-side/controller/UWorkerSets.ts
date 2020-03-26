@@ -29,9 +29,10 @@ export class UWorkerSets {
   }
 
   public decreaseConnNumById(workerId: string) {
+    // FIXME: After finishing downloading, the num doesn't decreased to 0
     for (let i = 0; i < this._records.length; i++) {
       if (this._records[i].peerId === workerId) {
-        this._records[i].connectingNum = Math.max(0, this._records[i].connectingNum);
+        this._records[i].connectingNum = Math.max(0, this._records[i].connectingNum - 1);
       }
     }
   }
