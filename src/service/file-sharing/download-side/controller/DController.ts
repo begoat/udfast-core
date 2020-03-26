@@ -118,12 +118,13 @@ export class DController {
   // main download algorighm
   private triggerDownload(downloadId: string) {
     const dRecords = this._downloadRecords[downloadId];
+    console.log('downloadId -> records:::', downloadId, this._downloadRecords[downloadId]);
     if (!dRecords || dRecords.done) { // skip when records for downloadId not exist or the download process it done.
       return false;
     }
 
     const { dWorkerSets, uWorkerSets, fileId, fileDownload } = dRecords;
-    dWorkerSets.getWorkerList().map(w => {
+    dWorkerSets.getWorkerList().forEach(w => {
       const { id: workerId, obj: dWorkerMediatorObj } = w;
       if (dWorkerSets.checkWorkerAvailable(workerId)) {
         if (this.checkPaused(downloadId)) {
@@ -148,12 +149,16 @@ export class DController {
 
             const result =
               await this.downloadChunkAndSave(downloadId, workerId, bestUploadWorkerId, nextDIdx, fileId, fileDownload);
+            console.log('downloading nextChunkIdx', nextDIdx);
+            uWorkerSets.decreaseConnNumById(workerId);
             if (result) {
               this.triggerDownload(downloadId);
             }
           })
-          .finally(() => {
+          .catch(() => {
             uWorkerSets.decreaseConnNumById(workerId);
+          })
+          .finally(() => {
             dWorkerSets.cleanupWorker(workerId);
           });
       }
