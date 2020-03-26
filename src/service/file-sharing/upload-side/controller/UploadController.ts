@@ -181,6 +181,7 @@ export class UploadController {
               const fileObj = this._fileStorage[downloadFileId];
               const chunkDataToSend = fileObj.getBlobByChunk(downloadChunkIdx, downloadChunkSize);
               const { fileSize } = fileObj.getFileInfo();
+              console.log('[UploadController]', 'upload chunk', downloadChunkIdx);
               const reqFileBlock: CommunicationData<CommFileBlockResp> = {
                 cmdPacket: CMD_SETS.REQUEST_FILE_BLOCK,
                 cmdData: {
