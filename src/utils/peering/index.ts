@@ -53,18 +53,22 @@ export const newPeerGeneratorWithReady = (peerId: string): Promise<Peer> => {
   return new Promise((resolve, reject) => {
     const peerInstance = genNewPeerWithDefaultConfig(peerId);
     peerInstance.on('open', () => {
+      peerInstance.on('disconnected', () => {
+        setTimeout(() => {
+          peerInstance.reconnect();
+        }, 1000);
+      });
       resolve(peerInstance);
     });
 
-    peerInstance.on('error', () => {
-      reject();
-    });
+    peerInstance.on('error', e => {
+      const { type } = e;
+      if (['browser-incompatible', 'disconnected'].indexOf(type) === -1) { // destroy if not this kinds of types
+        console.log('destroy server', peerId);
+        peerInstance.destroy();
+      }
 
-    peerInstance.on('disconnected', () => {
-      console.log('[peerInstance] disconnected');
-      setTimeout(() => {
-        peerInstance.reconnect();
-      }, 1000);
+      reject(type);
     });
   });
 };
