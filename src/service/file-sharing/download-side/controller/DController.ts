@@ -6,7 +6,7 @@ import { getNextDownloadIdx } from '../peer-related/DCommand';
 import { UWorkerSets } from './UWorkerSets';
 import { DWorkerSets } from './DWorkerSets';
 
-enum CbType {
+export enum CbType {
   ACC = 'acc',
   PROGRESS = 'progress',
   EXCEPTION = 'exception',

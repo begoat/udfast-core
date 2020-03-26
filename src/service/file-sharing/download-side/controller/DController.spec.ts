@@ -2,7 +2,7 @@ import { generateFile } from '@/utils/mock';
 import { generateDownloadId, generateTmpChannelId } from '@/utils/random';
 import { getWorkerNumBySize } from '@/utils/peering';
 
-import { DController } from './DController';
+import { DController, CbType } from './DController';
 import { UploadController } from '../../upload-side/controller/UploadController';
 import { FileDownloader } from './FileDownloader';
 
@@ -63,7 +63,7 @@ describe('DController:Basic functionality', () => {
     const fileId = this._uController.registerFile(file);
     await this._dController.getFileList(this._uPeerId);
     await this._dController.initDownload(downloadId, this._uPeerId, fileId);
-    this._dController.registerDownloadAcc(downloadId, () => {
+    this._dController.registerCbOnDownloadId(downloadId, () => {
       const dRecords = this._dController['_downloadRecords'][downloadId];
       expect((this._dController['getFileList'] as any).calls.count()).toBe(1);
       expect((this._dController['initDownload'] as any).calls.count()).toBe(1);
@@ -71,7 +71,7 @@ describe('DController:Basic functionality', () => {
       expect(dRecords.fileId === fileId).toBe(true);
       expect(dRecords.fileDownload instanceof FileDownloader).toBe(true);
       done();
-    });
+    }, CbType.ACC);
     this._dController.startDownloadFile(downloadId);
   });
 
@@ -81,9 +81,9 @@ describe('DController:Basic functionality', () => {
     const fileId = this._uController.registerFile(file);
     await this._dController.getFileList(this._uPeerId);
     await this._dController.initDownload(downloadId, this._uPeerId, fileId);
-    this._dController.registerDownloadAcc(downloadId, () => {
+    this._dController.registerCbOnDownloadId(downloadId, () => {
       done();
-    });
+    }, CbType.ACC);
     this._dController.startDownloadFile(downloadId);
     this._dController.pauseDownloadFile(downloadId);
     setTimeout(() => {
