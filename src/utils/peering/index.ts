@@ -58,6 +58,7 @@ export const newPeerGeneratorWithReady = (peerId: string): Promise<Peer> => {
           peerInstance.reconnect();
         }, 1000);
       });
+      // TODO: what if network problem occurred when app running
       resolve(peerInstance);
     });
 
