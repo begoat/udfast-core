@@ -44,3 +44,10 @@ export interface CommunicationData<T = any> {
   cmdPacket: CMD_SETS;
   cmdData: T;
 }
+
+export enum CbType {
+  ACC = 'acc',
+  PROGRESS = 'progress',
+  EXCEPTION = 'exception',
+  CANCEL = 'cancel',
+}

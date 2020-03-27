@@ -1,6 +1,7 @@
 import Peer, { DataConnection } from 'peerjs';
 import _ from 'lodash';
 
+import { log, warn } from '../../../../utils/log';
 import { generatePeerId, generateFileId } from '../../../../utils/random';
 import { newPeerGeneratorWithReady, getWorkerNumBySize } from '../../../../utils/peering';
 import { CMD_SETS } from '../../../../constants';
@@ -112,7 +113,7 @@ export class UploadController {
       },
     };
 
-    console.log('[upload controller] getFileList CMD send');
+    log('<upload controller> getFileList CMD send', reqInfoResp);
     connection.send(reqInfoResp);
   }
 
@@ -162,7 +163,7 @@ export class UploadController {
           }
         };
 
-        console.log('[upload controller] cmd startfileDownlood send', reqInfoResp);
+        log('<upload controller> startFileDownload CMD send', reqInfoResp);
         connection.send(reqInfoResp);
       });
   }
@@ -172,7 +173,7 @@ export class UploadController {
     workerPeerObj.on('connection', (workerDataConn: DataConnection) => {
       // also, if data sent before opened, it should be the downloader's responsibility to retry
       workerDataConn.on('open', () => {
-        console.log('[upload side] worker connection opened');
+        log('<upload worker>', workerPeerObj.id, 'opened');
         workerDataConn.on('data', (workerDataReceived: CommunicationData<CommFileBlockReq>) => {
           const { cmdPacket: workerDataPacket, cmdData: workerDataData } = workerDataReceived;
           if (workerDataPacket === CMD_SETS.REQUEST_FILE_BLOCK) {
@@ -181,7 +182,6 @@ export class UploadController {
               const fileObj = this._fileStorage[downloadFileId];
               const chunkDataToSend = fileObj.getBlobByChunk(downloadChunkIdx, downloadChunkSize);
               const { fileSize } = fileObj.getFileInfo();
-              console.log('[UploadController]', 'upload chunk', downloadChunkIdx);
               const reqFileBlock: CommunicationData<CommFileBlockResp> = {
                 cmdPacket: CMD_SETS.REQUEST_FILE_BLOCK,
                 cmdData: {
@@ -192,7 +192,7 @@ export class UploadController {
                 }
               };
 
-              console.log('[upload side] worker data send', reqFileBlock);
+              log('<upload worker>', workerPeerObj.id, 'chunk data sent', reqFileBlock);
               workerDataConn.send(reqFileBlock);
             }
           }
@@ -203,7 +203,7 @@ export class UploadController {
 
   private listenOnConnectionForMain() {
     this._mainPeerObj.on('connection', (dataConnection: DataConnection) => {
-      console.log('[upload controller] main connection open');
+      log('<upload controller>', this._mainPeerObj.id, 'opened');
       const { peer: peerId } = dataConnection; // get peer
       this.subscribeFileInfoReqOnDataConn(dataConnection);
       // FIXME: if the download controller trigger connection twice, the last one will be override in storage.
@@ -218,14 +218,14 @@ export class UploadController {
   private subscribeFileInfoReqOnDataConn = (connection: DataConnection) => {
     connection.on('open', () => {
       connection.on('data', (data: CommunicationData) => {
-        console.log('[upload controller] main data received', data);
+        log('<upload controller>', this._mainPeerObj.id, 'data received', data);
         const { cmdPacket, cmdData } = data;
         if (cmdPacket === CMD_SETS.GET_FILE_LIST) {
           this.handleCmdGetFilelist(connection, cmdData);
         } else if (cmdPacket === CMD_SETS.START_FILE_DOWNLOAD) {
           this.handleCmdStartFileDownload(connection, cmdData);
         } else {
-          console.warn('[upload controller] unknown data received', data);
+          warn('<upload controller>', this._mainPeerObj.id, 'unknown data received', data);
         }
       });
     });

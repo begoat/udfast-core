@@ -1,17 +1,12 @@
 import { WORKER_CHUNK_SIZE } from '../../../../config/index';
+import { log } from '../../../../utils/log';
 
 import { DMainMediator } from '../peer-related/DMainMediator';
+import { CbType } from '../../types';
 import { FileDownloader } from './FileDownloader';
 import { getNextDownloadIdx } from '../peer-related/DCommand';
 import { UWorkerSets } from './UWorkerSets';
 import { DWorkerSets } from './DWorkerSets';
-
-export enum CbType {
-  ACC = 'acc',
-  PROGRESS = 'progress',
-  EXCEPTION = 'exception',
-  CANCEL = 'cancel',
-}
 
 interface DownloadRecords {
   [downloadId: string]: {
@@ -60,7 +55,9 @@ export class DController {
    */
   public async getFileList(uploadPeerId: string) {
     await this._downloadMainMediator.connectToPeer(uploadPeerId);
+    log('getFileList start', 'targetPeerId', uploadPeerId);
     const fileList = await this._downloadMainMediator.getFileList(uploadPeerId);
+    log('getFileList end', 'targetPeerId', uploadPeerId);
     fileList.map(f => {
       this._fileStorage[f.fileId] = {
         fileName: f.fileName,
@@ -101,6 +98,8 @@ export class DController {
       downloadExceptionCbList: [],
       downloadCancelCbList: [],
     };
+
+    log('initDownload acc', downloadId, this._downloadRecords[downloadId]);
   }
 
   public registerCbOnDownloadId(downloadId: string, cb: Function, type: CbType) {
@@ -121,6 +120,7 @@ export class DController {
   public startDownloadFile(downloadId: string) {
     if (this._downloadRecords[downloadId]) {
       this._downloadRecords[downloadId].paused = false;
+      log('download progress start', ':downloadId', downloadId);
       this.triggerDownload(downloadId);
     }
   }
@@ -128,6 +128,7 @@ export class DController {
   public pauseDownloadFile(downloadId: string) {
     if (this._downloadRecords[downloadId]) {
       this._downloadRecords[downloadId].paused = true;
+      log('download progress paused', ':downloadId', downloadId);
     }
   }
 
@@ -135,6 +136,7 @@ export class DController {
     if (this._downloadRecords[downloadId]) {
       this._downloadRecords[downloadId].done = true;
       this._downloadRecords[downloadId].fileDownload.cancelDownload();
+      log('download progress cancelled', ':downloadId', downloadId);
       this._downloadRecords[downloadId].downloadCancelCbList.forEach(cb => cb());
     }
   }
@@ -142,7 +144,6 @@ export class DController {
   // main download algorighm
   private triggerDownload(downloadId: string) {
     const dRecords = this._downloadRecords[downloadId];
-    console.log('downloadId -> records:::', downloadId, this._downloadRecords[downloadId]);
     if (!dRecords || dRecords.done) { // skip when records for downloadId not exist or the download process it done.
       return false;
     }
@@ -154,6 +155,7 @@ export class DController {
       fileDownload,
       downloadAccCbList,
       downloadProgressCbList,
+      downloadExceptionCbList
     } = dRecords;
     dWorkerSets.getWorkerList().forEach(w => {
       const { id: workerId, obj: dWorkerMediatorObj } = w;
@@ -175,11 +177,11 @@ export class DController {
             const nextDIdx = getNextDownloadIdx(totalChunks, currentChunkIdx, dWorkerSets.getIsDownloadingChunkIdx());
             if (nextDIdx === -1) { // mark download acc
               downloadAccCbList && downloadAccCbList.forEach(cb => cb());
+              log('download progress acc', ':downloadId', downloadId);
               dRecords.done = true;
               return;
             }
 
-            console.log('downloading nextChunkIdx', nextDIdx);
             uWorkerSets.decreaseConnNumById(workerId);
             const result = await this.downloadChunkAndSave(
               downloadId,
@@ -194,7 +196,9 @@ export class DController {
               this.triggerDownload(downloadId);
             }
           })
-          .catch(() => {
+          .catch(e => {
+            log('download chunk', 'exception', e);
+            downloadExceptionCbList.forEach(cb => cb(e));
             uWorkerSets.decreaseConnNumById(workerId);
           })
           .finally(() => {
@@ -220,7 +224,9 @@ export class DController {
     const { dWorkerSets } = this._downloadRecords[downloadId];
     dWorkerSets.setCurrentChunkIdxForWorker(workerId, chunkIdx);
     downloadProgressCbList && downloadProgressCbList.forEach(cb => cb(chunkIdx, fileDownloader._totalNumOfChunks, 'start'));
+    log('download chunk', chunkIdx, 'start');
     const fileBlockResp = await dWorkerSets.reqFileBlock(workerId, uploaderId, fileId, chunkIdx, WORKER_CHUNK_SIZE);
+    log('download chunk', chunkIdx, 'end');
     downloadProgressCbList && downloadProgressCbList.forEach(cb => cb(chunkIdx, fileDownloader._totalNumOfChunks, 'end'));
     return fileDownloader.pushCachedBlob(chunkIdx, fileBlockResp.chunkData);
   }

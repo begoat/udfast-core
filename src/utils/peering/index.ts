@@ -4,6 +4,7 @@ import { TURN_URL, STUN_URL, STUN_TURN_CREDENTIAL, STUN_TURN_USER, LOAD_M_PER_WO
 
 import pkg from '../../../package.json';
 import { generatePeerId } from '../random';
+import { log } from '../log';
 
 const iceServerConfig = [
   { urls: TURN_URL, username: STUN_TURN_USER, credential: STUN_TURN_CREDENTIAL },
@@ -40,7 +41,7 @@ export const peerGeneratorForTestOnly = (peerId?: string): Promise<Peer> => {
 export const newPeerGeneratorWithoutReady = (peerId: string) => {
   const peerInstance = genNewPeerWithDefaultConfig(peerId);
   peerInstance.on('disconnected', () => {
-    console.log('[peerInstance] disconnected');
+    log('<peerInstance> disconnected, will retry after', 1000, 'ms');
     setTimeout(() => {
       peerInstance.reconnect();
     }, 1000);
@@ -65,7 +66,7 @@ export const newPeerGeneratorWithReady = (peerId: string): Promise<Peer> => {
     peerInstance.on('error', e => {
       const { type } = e;
       if (['browser-incompatible', 'disconnected'].indexOf(type) === -1) { // destroy if not this kinds of types
-        console.log('destroy server', peerId);
+        log('<peerInstance> destoried because of other reason');
         peerInstance.destroy();
       }
 
@@ -74,4 +75,4 @@ export const newPeerGeneratorWithReady = (peerId: string): Promise<Peer> => {
   });
 };
 
-export const getWorkerNumBySize = (fileSize?: number) => 3;
+export const getWorkerNumBySize = (fileSize?: number) => 5;

@@ -2,7 +2,8 @@ import { generateFile } from '@/utils/mock';
 import { generateDownloadId, generateTmpChannelId } from '@/utils/random';
 import { getWorkerNumBySize } from '@/utils/peering';
 
-import { DController, CbType } from './DController';
+import { DController } from './DController';
+import { CbType } from '../../types';
 import { UploadController } from '../../upload-side/controller/UploadController';
 import { FileDownloader } from './FileDownloader';
 
