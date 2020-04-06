@@ -88,6 +88,15 @@ export class DWorkerMediator extends DPeerBase {
 
     const channelId = generateTmpChannelId();
     const cbStorageForPeer = this._cbStorage[remoteWorkerId];
+    cbStorageForPeer.requestFileBlock = {
+      ...cbStorageForPeer.requestFileBlock,
+      [channelId]: {
+        cb: requestFileBlockCb,
+        timeout: undefined as any,
+        hasBeenCalled: false
+      }
+    };
+
     const timeout = pollingSend(() => {
       sendRequestFileBlock(this.getConnByRemotePeerId(remoteWorkerId), channelId, fileId, chunkIdx, chunkSize);
     }, {
@@ -97,14 +106,7 @@ export class DWorkerMediator extends DPeerBase {
       timeoutFn: timeoutCb,
     });
 
-    cbStorageForPeer.requestFileBlock = {
-      ...cbStorageForPeer.requestFileBlock,
-      [channelId]: {
-        cb: requestFileBlockCb,
-        timeout,
-        hasBeenCalled: false
-      }
-    };
+    cbStorageForPeer.requestFileBlock[channelId].timeout = timeout;
 
     return true;
   }

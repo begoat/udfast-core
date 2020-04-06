@@ -90,6 +90,15 @@ export class DMainMediator extends DPeerBase {
 
     const channelId = generateTmpChannelId();
     const cbStorageForPeer = this._cbStorage[remotePeerId];
+    cbStorageForPeer.getAllFileCmdCb = {
+      ...cbStorageForPeer.getAllFileCmdCb,
+      [channelId]: {
+        cb: getAllFileCb,
+        timeout: undefined as any,
+        hasBeenCalled: false,
+      }
+    };
+
     const timeout = pollingSend(() => {
       sendGetFileListCmd(this.getConnByRemotePeerId(remotePeerId), channelId);
     }, {
@@ -99,15 +108,7 @@ export class DMainMediator extends DPeerBase {
       timeoutFn: timeoutCb
     });
 
-    cbStorageForPeer.getAllFileCmdCb = {
-      ...cbStorageForPeer.getAllFileCmdCb,
-      [channelId]: {
-        cb: getAllFileCb,
-        timeout,
-        hasBeenCalled: false,
-      }
-    };
-
+    cbStorageForPeer.getAllFileCmdCb[channelId].timeout = timeout;
     return true;
   }
 
@@ -133,6 +134,15 @@ export class DMainMediator extends DPeerBase {
 
     const channelId = generateTmpChannelId();
     const cbStorageForPeer = this._cbStorage[remotePeerId];
+    cbStorageForPeer.startDownloadCmdCb = {
+      ...cbStorageForPeer.startDownloadCmdCb,
+      [channelId]: {
+        cb: startDownloadCb,
+        timeout: undefined as any,
+        hasBeenCalled: false
+      }
+    };
+
     const timeout = pollingSend(() => {
       sendStartDownloadCmd(this.getConnByRemotePeerId(remotePeerId), channelId, fileId);
     }, {
@@ -142,15 +152,7 @@ export class DMainMediator extends DPeerBase {
       timeoutFn: timeoutCb
     });
 
-    cbStorageForPeer.startDownloadCmdCb = {
-      ...cbStorageForPeer.startDownloadCmdCb,
-      [channelId]: {
-        cb: startDownloadCb,
-        timeout,
-        hasBeenCalled: false
-      }
-    };
-
+    cbStorageForPeer.startDownloadCmdCb[channelId].timeout = timeout;
     return true;
   }
 
