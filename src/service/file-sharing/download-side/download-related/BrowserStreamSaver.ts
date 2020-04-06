@@ -1,10 +1,15 @@
 import streamSaver from '../../../../libs/StreamSaver';
 
-/* eslint-disable */
-streamSaver.WritableStream = streamSaver.WritableStream;
-// streamSaver.TransformStream = streamSaver.TransformStream;
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const webStreamPonyfill = require('web-streams-polyfill/ponyfill');
 
-/* eslint-enable */
+const manuallyAssignWritableStream = () => {
+  /* eslint-disable */
+  streamSaver.WritableStream = webStreamPonyfill.WritableStream;
+  // streamSaver.TransformStream = webStreamPonyfill.TransformStream;
+  /* eslint-enable */
+};
+
 
 /**
  * This class is used to control the download process, interacting with the browser.
@@ -22,6 +27,7 @@ export class BrowserStreamSaver {
   private _unloadEvtHandler: () => void;
   private _beforeUnloadEvtHandler: (e: BeforeUnloadEvent) => void;
   constructor(fileName: string, fileSize: number, onlyUseTraditionalVersionJustForTest = false) {
+    manuallyAssignWritableStream();
     this._fileName = fileName;
     this._fileSize = fileSize;
     this._wStream = streamSaver.createWriteStream(this._fileName, {

@@ -1,3 +1,4 @@
+/** 2.0.3 */
 /* global chrome location ReadableStream define MessageChannel TransformStream */
 
 ;((name, definition) => {
@@ -11,7 +12,6 @@
 
   let mitmTransporter = null
   let supportsTransferable = false
-  const location = window.location
   const test = fn => { try { fn() } catch (e) {} }
   const ponyfill = window.WebStreamsPolyfill || {}
   const isSecureContext = window.isSecureContext
@@ -133,11 +133,6 @@
       readableStrategy: undefined
     }
 
-    let bytesWritten = 0 // by StreamSaver.js (not the service worker)
-    let downloadUrl = null
-    let channel = null
-    let ts = null
-
     // normalize arguments
     if (Number.isFinite(options)) {
       [ size, options ] = [ options, size ]
@@ -154,7 +149,9 @@
     if (!useBlobFallback) {
       loadTransporter()
 
-      channel = new MessageChannel()
+      var bytesWritten = 0 // by StreamSaver.js (not the service worker)
+      var downloadUrl = null
+      var channel = new MessageChannel()
 
       // Make filename RFC5987 compatible
       filename = encodeURIComponent(filename.replace(/\//g, ':'))
@@ -194,7 +191,7 @@
             }
           }
         }
-        ts = new streamSaver.TransformStream(
+        var ts = new streamSaver.TransformStream(
           transformer,
           opts.writableStrategy,
           opts.readableStrategy

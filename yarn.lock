@@ -7080,6 +7080,11 @@ watchpack@^1.6.0:
     graceful-fs "^4.1.2"
     neo-async "^2.5.0"
 
+web-streams-polyfill@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.npm.taobao.org/web-streams-polyfill/download/web-streams-polyfill-2.1.0.tgz#a4673244f92338e714bad632d2e0ef0004098271"
+  integrity sha1-pGcyRPkjOOcUutYy0uDvAAQJgnE=
+
 webpack-cli@^3.3.11:
   version "3.3.11"
   resolved "https://registry.npm.taobao.org/webpack-cli/download/webpack-cli-3.3.11.tgz#3bf21889bf597b5d82c38f215135a411edfdc631"
