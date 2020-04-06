@@ -81,7 +81,8 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-      { pattern: 'src/**/*.spec.ts', watched: false },
+      // { pattern: 'src/**/DController.spec.ts', watched: false },
+      { pattern: 'src/**/DController.spec.ts', watched: false },
     ],
 
     // list of files / patterns to exclude
@@ -125,7 +126,8 @@ module.exports = function(config) {
 
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    browsers: ['ChromeHeadlessCustom'],
+    // browsers: ['ChromeHeadlessCustom'],
+    browsers: ['Safari'],
 
 
      // you can define custom flags

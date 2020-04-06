@@ -6,6 +6,12 @@ import pkg from '../../../package.json';
 import { generatePeerId } from '../random';
 import { log } from '../log';
 
+// function checkSafari() {
+//   let seemsChrome = navigator.userAgent.indexOf('Chrome') > -1;
+//   let seemsSafari = navigator.userAgent.indexOf('Safari') > -1;
+//   return true || (seemsSafari && !seemsChrome);
+// }
+
 const iceServerConfig = [
   { urls: TURN_URL, username: STUN_TURN_USER, credential: STUN_TURN_CREDENTIAL },
   { urls: STUN_URL },
@@ -13,11 +19,12 @@ const iceServerConfig = [
 ];
 
 const genNewPeerWithDefaultConfig = (peerId: string) => new Peer(peerId, {
-  debug: 2,
+  debug: 3,
   config: { iceServers: iceServerConfig },
   ...(process.env.NODE_ENV === 'development' && { // todo only use local when developing
     host: '127.0.0.1',
     port: Number(pkg.config.port),
+    // ...(checkSafari() && { serialization: 'json' })
   })
 });
 
