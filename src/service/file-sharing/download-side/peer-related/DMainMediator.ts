@@ -74,7 +74,7 @@ export class DMainMediator extends DPeerBase {
       const result = this._getFileList(
         remotePeerId,
         (fileList: CommAllListResp['fileList']) => resolve(fileList),
-        reject,
+        () => reject('getFileList timeout'),
       );
 
       if (!result) {
@@ -118,7 +118,7 @@ export class DMainMediator extends DPeerBase {
         remotePeerId,
         fileId,
         (peerList: CommStartDownloadingResp['peerList']) => resolve(peerList),
-        reject,
+        () => reject('startDownload timeout'),
       );
 
       if (!result) {

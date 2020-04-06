@@ -203,6 +203,7 @@ export class DController {
           })
           .finally(() => {
             dWorkerSets.cleanupWorker(workerId);
+            this.triggerDownload(downloadId);
           });
       }
     });
