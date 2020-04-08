@@ -64,6 +64,7 @@ module.exports = {
     "react-hooks/exhaustive-deps": WARNING,
     '@typescript-eslint/no-unused-expressions': OFF,
     'dot-notation': OFF,
-    '@typescript-eslint/no-extra-semi': OFF
+    '@typescript-eslint/no-extra-semi': OFF,
+    'no-unused-expressions': OFF
   }
 };
