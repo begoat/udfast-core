@@ -44,8 +44,8 @@ export class DController {
     this._fileStorage = {};
   }
 
-  public static async init() {
-    const downloadMainMediator = await DMainMediator.init();
+  public static async init(errCbs?: Function[]) {
+    const downloadMainMediator = await DMainMediator.init(errCbs);
     const instance = new DController(downloadMainMediator);
     return instance;
   }

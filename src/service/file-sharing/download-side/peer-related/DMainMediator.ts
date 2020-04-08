@@ -45,9 +45,9 @@ export class DMainMediator extends DPeerBase {
     this._cbStorage = {};
   }
 
-  public static async init() {
+  public static async init(errCbs?: Function[]) {
     // FIXME: for Downloader， should we really need to wait for peer get ready? https://peerjs.com/docs.html#peeron
-    const peerObj = await newPeerGeneratorWithReady(generatePeerId());
+    const peerObj = await newPeerGeneratorWithReady(generatePeerId(), errCbs);
     const instance = new DMainMediator(peerObj);
     return instance;
   }

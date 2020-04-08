@@ -1,4 +1,5 @@
 import Peer from 'peerjs';
+import _ from 'lodash';
 
 import { TURN_URL, STUN_URL, STUN_TURN_CREDENTIAL, STUN_TURN_USER, LOAD_M_PER_WORKER } from '../../config/index';
 
@@ -50,15 +51,22 @@ export const newPeerGeneratorWithoutReady = (peerId: string) => {
   return peerInstance;
 };
 
-export const newPeerGeneratorWithReady = (peerId: string): Promise<Peer> => {
+export const newPeerGeneratorWithReady = (peerId: string, errCbs?: Function[]): Promise<Peer> => {
   return new Promise((resolve, reject) => {
     const peerInstance = genNewPeerWithDefaultConfig(peerId);
     peerInstance.on('open', () => {
       peerInstance.on('disconnected', () => {
         setTimeout(() => {
-          peerInstance.reconnect();
+          try {
+            peerInstance.reconnect();
+          } catch(e) {
+            errCbs?.forEach(cb => {
+              _.isFunction(cb) && cb(e);
+            });
+          }
         }, 1000);
       });
+
       // TODO: what if network problem occurred when app running
       resolve(peerInstance);
     });
@@ -66,8 +74,14 @@ export const newPeerGeneratorWithReady = (peerId: string): Promise<Peer> => {
     peerInstance.on('error', e => {
       const { type } = e;
       if (['browser-incompatible', 'disconnected'].indexOf(type) === -1) { // destroy if not this kinds of types
-        log('<peerInstance> destoried because of other reason');
-        peerInstance.destroy();
+        log('<peerInstance> destoried because of other reason', e);
+        try {
+          peerInstance.destroy();
+        } catch {
+          errCbs?.forEach(cb => {
+            _.isFunction(cb) && cb(e);
+          });
+        }
       }
 
       reject(type);
