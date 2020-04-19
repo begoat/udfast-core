@@ -14,7 +14,7 @@ const iceServerConfig = [
 ];
 
 const genNewPeerWithDefaultConfig = (peerId: string) => new Peer(peerId, {
-  debug: 2,
+  debug: 3,
   config: { iceServers: iceServerConfig },
   ...(process.env.NODE_ENV === 'development' && { // todo only use local when developing
     host: '127.0.0.1',

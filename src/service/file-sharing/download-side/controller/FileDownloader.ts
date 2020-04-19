@@ -8,7 +8,7 @@ export enum ChunkStatus {
   WRITE_FINISHED = 'WRITE_FINISHED'
 }
 
-interface ChunkEntity {
+export interface ChunkEntity {
   status: ChunkStatus;
   blobData: Blob;
   startTime: number;

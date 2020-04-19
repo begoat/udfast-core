@@ -173,8 +173,8 @@ export class DController {
         dWorkerSets.markWorkerBusy(workerId);
         dWorkerMediatorObj.connectToPeer(bestUploadWorkerId)
           .then(async () => {
-            const { _totalNumOfChunks: totalChunks, _chunkWritePosition: currentChunkIdx } = fileDownload;
-            const nextDIdx = getNextDownloadIdx(totalChunks, currentChunkIdx, dWorkerSets.getIsDownloadingChunkIdx());
+            const { _totalNumOfChunks: totalChunks, _chunkWritePosition: currentChunkIdx, _chunkStorage: chunkStorage } = fileDownload;
+            const nextDIdx = getNextDownloadIdx(totalChunks, currentChunkIdx, dWorkerSets.getIsDownloadingChunkIdx(), chunkStorage);
             if (nextDIdx === -1) { // mark download acc
               downloadAccCbList && downloadAccCbList.forEach(cb => cb());
               log('download progress acc', ':downloadId', downloadId);

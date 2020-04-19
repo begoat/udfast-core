@@ -114,6 +114,7 @@ export class DWorkerMediator extends DPeerBase {
   private listenOnConnectionForMain(dataConn: DataConnection) {
     dataConn.on('data', (data: CommunicationData) => {
       const { cmdPacket, cmdData } = data;
+      console.log('worker---cmdPacket, ', cmdPacket, 'cmdData', cmdData);
       if (cmdPacket === CMD_SETS.REQUEST_FILE_BLOCK) {
         const { channelId, chunkIdx, chunkData, done } = cmdData as CommunicationData<CommFileBlockResp>['cmdData'];
         const uploaderPeerId = extractRemotePeerIdFromDataConn(dataConn);
