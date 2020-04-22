@@ -16,6 +16,7 @@ interface DownloadRecords {
     fileDownload: FileDownloader;
     done: boolean;
     paused: boolean;
+    exceptionIdxList: Array<number>;
     downloadAccCbList: Array<Function>;
     downloadProgressCbList: Array<Function>;
     downloadExceptionCbList: Array<Function>;
@@ -93,6 +94,7 @@ export class DController {
       fileDownload: new FileDownloader(fileName, fileSize, WORKER_CHUNK_SIZE),
       done: false,
       paused: false,
+      exceptionIdxList: [],
       downloadAccCbList: [],
       downloadProgressCbList: [],
       downloadExceptionCbList: [],
@@ -174,7 +176,7 @@ export class DController {
         dWorkerMediatorObj.connectToPeer(bestUploadWorkerId)
           .then(async () => {
             const { _totalNumOfChunks: totalChunks, _chunkWritePosition: currentChunkIdx, _chunkStorage: chunkStorage } = fileDownload;
-            const nextDIdx = getNextDownloadIdx(totalChunks, currentChunkIdx, dWorkerSets.getIsDownloadingChunkIdx(), chunkStorage);
+            const nextDIdx = getNextDownloadIdx(totalChunks, currentChunkIdx, dWorkerSets.getIsDownloadingChunkIdx(), chunkStorage, dRecords.exceptionIdxList);
             if (nextDIdx === -1) { // mark download acc
               downloadAccCbList && downloadAccCbList.forEach(cb => cb());
               log('download progress acc', ':downloadId', downloadId);
@@ -197,7 +199,9 @@ export class DController {
             }
           })
           .catch(e => {
-            log('download chunk', 'exception', e);
+            const { index, message } = e;
+            log('download chunk', 'exception', message);
+            this._downloadRecords[downloadId].exceptionIdxList.push(index);
             downloadExceptionCbList.forEach(cb => cb(e));
             uWorkerSets.decreaseConnNumById(workerId);
           })

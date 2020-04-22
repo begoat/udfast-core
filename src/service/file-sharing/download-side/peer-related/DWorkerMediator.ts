@@ -65,7 +65,7 @@ export class DWorkerMediator extends DPeerBase {
         chunkIdx,
         chunkSize,
         (fileBlockResp: Omit<CommFileBlockResp, 'channelId'>) => resolve(fileBlockResp),
-        () => reject('requestFileBlock timeout'),
+        () => reject({ index: chunkIdx, message: 'requestFileBlock timeout' }),
       );
 
       if (!result) {

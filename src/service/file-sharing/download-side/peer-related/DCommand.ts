@@ -90,15 +90,20 @@ export const handleCmdRespReceived = (cbRecords: CbRecords, cbParam: any) => {
  * current the algorithm relys on the currentWritePos to determine the next download chunkIdx,
  * This can make sure that the blob needed is correctly downloaded.
  *
- * TODO: But maybe a more resource optimized way it maintain an array of chunks. pop the element out of the array when download starts,
- * and re-add it to the array when downloads timeout.
  */
 export const getNextDownloadIdx = (
   totalNumOfChunks: number,
   currentWritePos: number,
   isDownloadingChunkList: Array<number>,
-  chunkStorage: {[chunkIdx: number]: ChunkEntity}
+  chunkStorage: {[chunkIdx: number]: ChunkEntity},
+  exceptionIdList: Array<number>,
 ): number => {
+  // If certain file chunks download failed before, re-download it at once.
+  const id = exceptionIdList.sort().pop();
+  if (id !== undefined && _.isNumber(id)) {
+    return id;
+  }
+
   for (let i = currentWritePos; i < totalNumOfChunks; i++) {
     if (isDownloadingChunkList.indexOf(i) === -1 && [ChunkStatus.WRITE_FINISHED, ChunkStatus.DOWNLOADED_NOT_WRITE].indexOf(_.get(chunkStorage, `${i}.status`)) === -1) {
       return i;
