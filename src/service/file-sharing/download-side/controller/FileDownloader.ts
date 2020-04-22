@@ -43,6 +43,7 @@ export class FileDownloader {
   }
 
   public pushCachedBlob(chunkIdx: number, chunkData: Blob): boolean {
+    // TODO: set a max cache index, so that for large enough files, the memory will not exceed.
     if (chunkIdx >= this._totalNumOfChunks || chunkIdx < 0) {
       return false;
     }
